@@ -10,12 +10,13 @@ TWITTER_USERS = ['elonmusk', 'cz_binance', 'VitalikButerin', 'JnP6900erc']
 last_tweets = {}
 
 def send_telegram_message(message):
-    print(f"🛫 Gửi Telegram: {message}")
+    print("🛫 Gửi đến Telegram:", message)
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
     try:
-        requests.post(url, data={'chat_id': TELEGRAM_CHAT_ID, 'text': message})
+        r = requests.post(url, data={'chat_id': TELEGRAM_CHAT_ID, 'text': message})
+        print("📬 Kết quả gửi:", r.status_code, r.text)
     except Exception as e:
-        print(f"❌ Gửi lỗi: {e}")
+        print("❌ Gửi lỗi:", e)
 
 app = Flask('')
 
