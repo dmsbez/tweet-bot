@@ -1,7 +1,2 @@
-services:
-  - type: web
-    name: tweet-bot
-    env: python
-    startCommand: python main.py
-    plan: free
-    region: singapore
+build:
+  pythonVersion: 3.10
