@@ -3,14 +3,19 @@ from flask import Flask
 from threading import Thread
 
 TELEGRAM_TOKEN = '7970022703:AAEFU0v_402lujK3-FHkP6xW0NXKeteco3U'
-TELEGRAM_CHAT_ID = '-1001875640464'
+TELEGRAM_CHAT_ID = '6921514427'  # ✅ test bằng cá nhân trước
+
 TWITTER_USERS = ['elonmusk', 'cz_binance', 'VitalikButerin', 'JnP6900erc']
 
 last_tweets = {}
 
 def send_telegram_message(message):
+    print(f"🛫 Gửi Telegram: {message}")
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
-    requests.post(url, data={'chat_id': TELEGRAM_CHAT_ID, 'text': message})
+    try:
+        requests.post(url, data={'chat_id': TELEGRAM_CHAT_ID, 'text': message})
+    except Exception as e:
+        print(f"❌ Gửi lỗi: {e}")
 
 app = Flask('')
 
@@ -27,12 +32,20 @@ def keep_alive():
 def check_tweets():
     while True:
         for user in TWITTER_USERS:
-            feed = feedparser.parse(f'https://nitter.privacydev.net/{user}/rss')
-            if feed.entries:
+            print(f"🔍 Đang check {user}...")
+            try:
+                feed = feedparser.parse(f'https://nitter.privacydev.net/{user}/rss')
+                if not feed.entries:
+                    print(f"⚠️ Không lấy được tweet từ {user}")
+                    continue
                 latest = feed.entries[0]
                 if last_tweets.get(user) != latest.id:
                     last_tweets[user] = latest.id
-                    send_telegram_message(f"🧠 {user} vừa tweet:\n\n{latest.title}\n\n🔗 {latest.link}")
+                    message = f"🧠 {user} vừa tweet:\n\n{latest.title}\n\n🔗 {latest.link}"
+                    send_telegram_message(message)
+                    print(f"✅ Đã gửi tweet mới từ {user}")
+            except Exception as e:
+                print(f"❌ Lỗi khi check {user}: {e}")
         time.sleep(30)
 
 if __name__ == '__main__':
